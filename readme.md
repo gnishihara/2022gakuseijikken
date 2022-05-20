@@ -5,4 +5,4 @@
 
 Quarto のファイルは `report.qmd` です。
 
-![](readme_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+<img src="readme_files/figure-gfm/unnamed-chunk-1-1.png" width="30%" style="display: block; margin: auto;" />
