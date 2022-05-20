@@ -1,0 +1,50 @@
+---
+output: github_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(showtext)
+library(ggpubr)
+font_files() |> as_tibble() |> filter(str_detect(ps_name, "jp"))
+font_add("notosans", 
+         regular = "NotoSansCJKjp-Regular.otf")
+theme_pubclean(base_size = 12,
+           base_family = "notosans") |> theme_set()
+showtext_auto()
+
+knitr::opts_chunk$set(echo = FALSE)
+url = "https://github.com/gnishihara/2022gakuseijikken"
+```
+
+## 2022年度海洋生物科学実験III
+
+解析例は `analysis-script.R` にあります。
+
+Quarto のファイルは `report.qmd` です。
+
+```{r}
+fix_name = \(x) sprintf("V%04d", 1:length(x))
+z1 = qrcode::qr_code(url, "H") |> as_tibble(.name_repair = fix_name) |> 
+  mutate(y = 1:n()) |> 
+  pivot_longer(-y) |> 
+  mutate(x = str_extract(name, "[0-9]+")) |> 
+  mutate(x = as.numeric(x)) |> 
+  mutate(value = factor(as.numeric(value)))
+ggplot(z1) + 
+  geom_tile(aes(x = x, y = rev(y), fill = value), show.legend = F) +
+  annotate("text", x = median(z1$x), y = 0, label = "リポジトリのリンク", 
+           family = "notosans", fontface = "bold", color = "grey30") +
+  scale_fill_grey(start = 1, end = 0) +
+  coord_equal() +
+  ggpubr::clean_theme() +
+  theme(plot.background = element_blank(),
+        panel.background = element_blank(),
+        panel.grid = element_blank(),
+        axis.title = element_blank(),
+        axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank())
+
+```
+
