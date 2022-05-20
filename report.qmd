@@ -1,0 +1,104 @@
+---
+title: "光合成曲線の解析"
+date: today
+author: Greg Nishihara
+page-width: 5.906
+execute:
+  echo: false
+  warning: false
+  fig-align: center
+format: docx
+---
+
+```{r}
+#| include: false
+source("analysis-script.R")
+```
+
+## 光合成曲線のモデル
+
+$$
+P_{net} = P_{max}\left(1-\exp\left(-\frac{\alpha}{P_{max}}I\right)\right) -R_d
+$$
+
+## Figure
+
+![オゴノリの光合成速度](figure-01-ogonori.png) 
+
+![オゴノリの光合成光曲線](figure-02-ogonori.png) 
+
+## Tables
+
+動的にワードファイルに表を埋め込めます。
+そのとき、`flextable` のパッケージが必要です。
+このパッケージは dependency は多いです。
+
+1. [`node.js`](https://nodejs.org/)
+1. `equatags` パッケージ
+1. `python`
+
+まずは、Windowsに `node.js` をインストールしましょう。
+これは R のパッケージではありません。
+このソフトをインストールすると、`python` やその他のソフトもインストールされます。
+ハードディスクに 3GB 程度の容量が必要です。
+
+`node.js` のインストールができたら、
+R コンソールで、`equatags::mathjax_install()` を実行してください。
+この作業は一度やったら、二度とする必要はないです。
+だが、`equatags` を更新したら `equatags::mathjax_install()`　を実行してください。
+
+サーバーには必要なソフトはすべてインストール済みですが、`equatags::mathjax_install()`はユーザー毎にする必要があるので、一回は実行してください。
+
+
+```{r}
+library(flextable)
+
+read_csv("ogonori-model.csv") |> 
+  flextable() |> 
+  colformat_double(j = "light", digits = 0) |> 
+  colformat_double(j = "adj.r.squared", digits = 4) |> 
+  colformat_double(j = "statistic", digits = 1) |> 
+  set_header_labels(light = "光量子量",
+                    adj.r.squared = "Radj^2",
+                    statistic = "F value",
+                    df = "D.F.",
+                    p.value = "P value") |> 
+  mk_par(j = "adj.r.squared", 
+         value = as_paragraph(as_equation("\\mathrm{R_{adj}^2}", width = 3, height = 1)), part = "header") |>
+  set_table_properties(layout = "autofit") |> 
+  footnote(j=1, value = as_paragraph(as_equation("\\mathrm{\\mu mol~photons~m^{-2}~s^{-1}}")), ref_symbols = "1", part = "header") |> 
+  set_caption("オゴノリの光合成速度のモデル統計量")
+```
+
+
+```{r}
+eq = c(
+  "\\mathrm{\\mu g~O_{2}~g_{ww}^{-1}~min^{-1}}",
+  "\\mathrm{\\mu g~O_{2}~g_{ww}^{-1}~min^{-1} (\\mu~mol~photons~m^{-2}~s^{-1})^{-1}}",
+  "\\mathrm{\\mu g~O_{2}~g_{ww}^{-1}~min^{-1}}",
+  "\\mathrm{\\mu mol~photons~m^{-2}~s^{-1}}",
+  "\\mathrm{\\mu mol~photons~m^{-2}~s^{-1}}")
+
+read_csv("ogonori-parameters.csv") |> 
+  mutate(name = fct_recode(name,
+                           "\\mathrm{P_{max}}" = "pmax",
+                           "\\alpha" = "alpha",
+                           "\\mathrm{R_{d}}" = "rd",
+                           "\\mathrm{I_{c}}" = "ic",
+                           "\\mathrm{I_{k}}" = "ik")) |> 
+  mutate(eq = eq) |> 
+  flextable() |> 
+  mk_par(j = "eq", value = as_paragraph(as_equation(eq, width = 3, height = 1))) |> 
+  mk_par(j = "name", value = as_paragraph(as_equation(name, width = 3, height = 1))) |> 
+  colformat_double(i = 1, digits = 1) |> 
+  colformat_double(i = 2, digits = 3) |> 
+  colformat_double(i = 3, digits = 1) |> 
+  colformat_double(i = 4, digits = 1) |> 
+  colformat_double(i = 5, digits = 1) |> 
+  set_header_labels(name = "モデルパラメータ",
+                    value = "値",
+                    eq = "単位") |> 
+  set_table_properties(layout = "autofit") |> 
+  set_caption("オゴノリの光合成光曲線のモデルパラメータ")
+```
+
