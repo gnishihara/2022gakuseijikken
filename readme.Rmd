@@ -39,7 +39,7 @@ ggplot(z1) +
   
 pdffile = "qrcode.pdf"
 pngfile = str_replace(pdffile, "pdf", "png")
-ggsave(pdffile, width = 50, height = 50, units = "mm")
+ggsave(pdffile, width = 70, height = 70, units = "mm")
 magick::image_read_pdf(pdffile) |> magick::image_write(pngfile)
 ```
 
