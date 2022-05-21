@@ -1,7 +1,7 @@
 
 ## 2022年度海洋生物科学実験III
 
-動画で紹介した解析例は `ogoniri-analysis.R` にあります。
+動画で紹介した解析例は `ogonori-analysis.R` にあります。
 
 Quarto のファイルは `report.qmd` です。
 
